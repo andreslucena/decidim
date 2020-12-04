@@ -28,6 +28,7 @@ The following YAML snippet with all the defined environment variables should be 
   bulletin_board:
     identification_private_key: <%= ENV["BULLETIN_BOARD_IDENTIFICATION_PRIVATE_KEY"] %>
     server: <%= ENV["BULLETIN_BOARD_SERVER"] %>
+    websocket_url: <%= ENV["BULLETIN_BOARD_WEBSOCKET_URL"] %>
     api_key: <%= ENV["BULLETIN_BOARD_API_KEY"] %>
     number_of_trustees: <%= ENV["BULLETIN_BOARD_NUMBER_OF_TRUSTEES"] %>
     authority_name: <%= ENV["BULLETIN_BOARD_AUTHORITY_NAME"] %>
