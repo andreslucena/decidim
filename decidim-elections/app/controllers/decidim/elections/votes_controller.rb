@@ -10,10 +10,24 @@ module Decidim
       helper VotesHelper
       helper_method :elections, :election, :questions, :questions_count, :booth_mode
 
+      skip_before_action :verify_authenticity_token, only: :cast # TODO: do something
+
       delegate :count, to: :questions, prefix: true
 
       def new
         redirect_to(return_path, alert: t("votes.messages.not_allowed", scope: "decidim.elections")) unless booth_mode
+      end
+
+      def cast
+        form = Voter::EncryptedVoteForm.from_params(params).with_context(user: current_user)
+        Voter::CastVote.call(form) do
+          on(:ok) do
+            render json: { ok: true }
+          end
+          on(:invalid) do
+            render json: { ok: false }
+          end
+        end
       end
 
       private

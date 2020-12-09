@@ -1,5 +1,6 @@
 /* eslint-disable require-jsdoc, prefer-template, func-style, id-length, no-use-before-define, init-declarations, no-invalid-this */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
+// = require decidim-bulletin_board
 
 $(() => {
   const $vote = $(".focus");
@@ -138,14 +139,26 @@ $(() => {
 
   // cast vote
   function castVote(boothMode, formData) {
-    // log form Data
-    console.log(`Your vote got encrypted successfully. The booth mode is ${boothMode}. Your vote content is:`, formData) // eslint-disable-line no-console
+    const { Voter } = decidimBulletinBoard;
 
-    window.setTimeout(function() {
-      $($vote).find("#encrypting").addClass("hide")
-      $($vote).find("#confirmed_page").removeClass("hide")
-      window.confirmed = true;
-    }, 3000)
+    const voter = new Voter('voter-1'); // TODO: hardcoded voter unique id
+    voter.encrypt(formData).then(encryptedVote => {
+      return $.ajax({
+        method: "POST",
+        url: "http://localhost:3000/processes/sit-id/f/20/elections/9/vote/cast", // TODO: hardcoded url
+        contentType: "application/json",
+        data: JSON.stringify({ encrypted_vote: encryptedVote })
+      });
+    }).then(result => {
+      console.log(result);
+
+      // TODO: Send vote to decidim
+      setTimeout(() => {
+        $($vote).find("#encrypting").addClass("hide")
+        $($vote).find("#confirmed_page").removeClass("hide")
+        window.confirmed = true;
+      }, 0) // TODO: why this timeout is even necessary?
+    })
   }
 
   // exit message before confirming
