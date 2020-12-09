@@ -7,7 +7,7 @@ FactoryBot.define do
   factory :elections_component, parent: :component do
     name { Decidim::Components::Namer.new(participatory_space.organization.available_locales, :elections).i18n_name }
     manifest_name { :elections }
-    participatory_space { create(:participatory_process, :with_steps) }
+    participatory_space { create(:participatory_process, :with_steps, organization: organization) }
   end
 
   factory :election, class: "Decidim::Elections::Election" do
@@ -170,7 +170,11 @@ FactoryBot.define do
 
     trait :with_public_key do
       considered
-      public_key { Random.urlsafe_base64(30) }
+      sequence(:public_key) do
+        private_key = JWT::JWK.new(OpenSSL::PKey::RSA.new(4096))
+        public_key = private_key.export
+        public_key.to_json
+      end
     end
   end
 

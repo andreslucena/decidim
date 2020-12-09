@@ -6,6 +6,7 @@ describe Decidim::Elections::Admin::SetupElection do
   subject { described_class.new(form, bulletin_board: bulletin_board) }
 
   let(:organization) { create :organization, available_locales: [:en, :ca, :es], default_locale: :en }
+  let(:invalid) { false }
   let(:participatory_process) { create :participatory_process, organization: organization }
   let(:current_component) { create :component, participatory_space: participatory_process, manifest_name: "elections" }
   let(:user) { create :user, :admin, :confirmed, organization: organization }
@@ -24,31 +25,28 @@ describe Decidim::Elections::Admin::SetupElection do
       errors: errors
     )
   end
+  let(:scheme) do
+    {
+      name: "dummy",
+      parameters: {
+        quorum: 2
+      }
+    }
+  end
+  let(:status) { OpenStruct.new(status: "key_ceremony") }
+  let(:response) do
+    OpenStruct.new(election: status, error: nil)
+  end
+
   let(:bulletin_board) do
-    Decidim::Elections::BulletinBoardClient.new(
-      server: "http://localhost:8000/api",
-      api_key: Rails.application.secrets.bulletin_board[:api_key],
-      authority_name: "Decidim Test Authority",
-      scheme: {
-        name: "test",
-        parameters: {
-          quorum: 2
-        }
-      },
-      number_of_trustees: 2,
-      identification_private_key: identification_private_key
-    )
+    double(Decidim::Elections.bulletin_board)
   end
 
-  let(:identification_private_key) do
-    Rails.application.secrets.bulletin_board[:identification_private_key]
+  before do
+    allow(bulletin_board).to receive(:authority_slug).and_return("decidim-test-authority")
+    allow(bulletin_board).to receive(:scheme).and_return(scheme)
+    allow(bulletin_board).to receive(:setup_election).and_return(response)
   end
-
-  let(:identification_private_key_content) do
-    Decidim::Elections::JwkUtils.import_private_key(identification_private_key)
-  end
-
-  let(:invalid) { false }
 
   context "when the form is not valid" do
     let(:invalid) { true }
@@ -58,7 +56,7 @@ describe Decidim::Elections::Admin::SetupElection do
     end
   end
 
-  context "when valid form", :vcr do
+  context "when valid form" do
     let(:trustee_users) { trustees.collect(&:user) }
 
     it "setup the election" do
