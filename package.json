@@ -256,7 +256,7 @@
     "@babel/types": "^7.0.0-beta.40",
     "axios": "^0.18.0",
     "classnames": "^2.2.5",
-    "jquery": "^3.2.1",
+    "jquery": "^3.5.1",
     "postcss": "^7.0.32",
     "prop-types": "^15.5.7",
     "react": "^16.0.0",
