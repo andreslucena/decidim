@@ -258,7 +258,7 @@
     "classnames": "^2.2.5",
     "jquery": "^3.2.1",
     "postcss": "^7.0.32",
-    "prop-types": "^15.5.7",
+    "prop-types": "^15.7.2",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-i18nify": "^1.8.8",
